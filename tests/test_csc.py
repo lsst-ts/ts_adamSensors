@@ -13,7 +13,7 @@ class CscTestCase(salobj.BaseCscTestCase, asynctest.TestCase):
     def basic_make_csc(self, initial_state, config_dir, simulation_mode):
         return adamSensors.adamSensorsCSC.AdamCSC(initial_state=initial_state, config_dir=config_dir)
 
-    async def test_one(self):
+    async def test_start(self):
         async with self.make_csc(
             initial_state=salobj.State.STANDBY,
             config_dir="/home/saluser/gitdir/ts_config_eas/AdamSensors/v1/",  # make this smarter some day

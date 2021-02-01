@@ -49,11 +49,11 @@ class AdamCSC(salobj.ConfigurableCsc):
         # set up dictionary
         sensors = {
             0: (self.config.analog_input_0_type, poly1d(self.config.analog_input_0_coefficients)),
-            1: (self.config.analog_input_1_type, poly1d(self.config.analog_input_0_coefficients)),
-            2: (self.config.analog_input_2_type, poly1d(self.config.analog_input_0_coefficients)),
-            3: (self.config.analog_input_3_type, poly1d(self.config.analog_input_0_coefficients)),
-            4: (self.config.analog_input_4_type, poly1d(self.config.analog_input_0_coefficients)),
-            5: (self.config.analog_input_5_type, poly1d(self.config.analog_input_0_coefficients)),
+            1: (self.config.analog_input_1_type, poly1d(self.config.analog_input_1_coefficients)),
+            2: (self.config.analog_input_2_type, poly1d(self.config.analog_input_2_coefficients)),
+            3: (self.config.analog_input_3_type, poly1d(self.config.analog_input_3_coefficients)),
+            4: (self.config.analog_input_4_type, poly1d(self.config.analog_input_4_coefficients)),
+            5: (self.config.analog_input_5_type, poly1d(self.config.analog_input_5_coefficients)),
         }
 
         # figure out which topics to publish
