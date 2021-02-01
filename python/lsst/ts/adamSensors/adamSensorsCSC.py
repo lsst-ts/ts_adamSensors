@@ -11,7 +11,7 @@ class AdamCSC(salobj.ConfigurableCsc):
     CSC for simple sensors connected to an ADAM controller
     """
 
-    def __init__(self, config_dir=None, initial_state=salobj.State.STANDBY, initial_simulation_mode=0):
+    def __init__(self, config_dir=None, initial_state=salobj.State.STANDBY, simulation_mode=0):
         schema_path = pathlib.Path(__file__).resolve().parents[4].joinpath("schema", "AdamSensors.yaml")
         super().__init__(
             "AdamSensors",
@@ -19,25 +19,24 @@ class AdamCSC(salobj.ConfigurableCsc):
             schema_path=schema_path,
             config_dir=config_dir,
             initial_state=initial_state,
-            initial_simulation_mode=initial_simulation_mode,
+            simulation_mode=simulation_mode,
         )
 
-        self.connected = False
         self.adam = None
         self.config = None
+        self.start_timeout = 10
+        self.valid_simulation_modes = [0, 1]
 
         # setup asyncio tasks for the loop
         done_task = asyncio.Future()
         done_task.set_result(None)
         self.telemetryLoopTask = done_task
 
-    async def begin_start(self, id_data):
-        await super().begin_start(id_data)
-        self.adam = AdamModel(self.log, simulation_mode=True)
-        loop = asyncio.get_event_loop()
-        executor = concurrent.futures.ThreadPoolExecutor()
-        await loop.run_in_executor(executor, self.adam.connect, self.config.adam_ip, self.config.adam_port)
-        self.connected = True
+    async def begin_start(self, data):
+        self.cmd_start.ack_in_progress(data, timeout=self.start_timeout)
+        await super().begin_start(data)
+        self.adam = AdamModel(self.log, simulation_mode=self.simulation_mode)
+        self.telemetryLoopTask = asyncio.create_task(self.telemetry_loop())
         await self.telemetry_loop()
 
     async def telemetry_loop(self):
@@ -69,7 +68,7 @@ class AdamCSC(salobj.ConfigurableCsc):
         executor = concurrent.futures.ThreadPoolExecutor()
 
         outputs = [0, 0, 0, 0, 0, 0]
-        while self.connected:
+        while True:
             voltages = await loop.run_in_executor(executor, self.adam.read_voltage)
 
             # convert the voltage into whatever units, according to the
@@ -120,7 +119,7 @@ class AdamCSC(salobj.ConfigurableCsc):
             if hasTemperature:
                 self.tel_temperature.put()
 
-            asyncio.sleep(1)
+            await asyncio.sleep(self.heartbeat_interval)
 
     @staticmethod
     def get_config_pkg():

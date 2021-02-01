@@ -11,7 +11,9 @@ STD_TIMEOUT = 15  # standard command timeout (sec)
 
 class CscTestCase(salobj.BaseCscTestCase, asynctest.TestCase):
     def basic_make_csc(self, initial_state, config_dir, simulation_mode):
-        return adamSensors.adamSensorsCSC.AdamCSC(initial_state=initial_state, config_dir=config_dir)
+        return adamSensors.adamSensorsCSC.AdamCSC(
+            initial_state=initial_state, config_dir=config_dir, simulation_mode=simulation_mode
+        )
 
     async def test_start(self):
         async with self.make_csc(
