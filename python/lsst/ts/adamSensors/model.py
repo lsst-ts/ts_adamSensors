@@ -1,8 +1,9 @@
 from pymodbus.client.sync import ModbusTcpClient as ModbusClient
-from pymodbus.exceptions import ConnectionException, ModbusIOException
+from pymodbus.exceptions import ConnectionException
+import logging
 
 
-class AdamModel():
+class AdamModel:
     """
     Class that reads sensor voltage(s) through an ADAM 6024 device
 
@@ -19,20 +20,24 @@ class AdamModel():
             the pymodbus object representing the ADAM 6024
     """
 
-    def __init__(self, log, simulation_mode=False):
+    def __init__(self, log=None, simulation_mode=False):
+        if log is None:
+            self.log = logging.getLogger(type(self).__name__)
+        else:
+            self.log = log.getChild(type(self).__name__)
         self.client = None
         self.clientip = None
         self.clientport = None
         self.log = log
 
         self.range_size = 20
-        self.range_start = -10 # zero point offset for the ADAM device
+        self.range_start = -10  # zero point offset for the ADAM device
         self.simulation_mode = simulation_mode
 
     def connect(self, ip, port):
         self.clientip = ip
         self.clientport = port
-        if simulation_mode:
+        if self.simulation_mode:
             self.client = None
         else:
             self.client = ModbusClient(self.clientip, self.clientport)
@@ -41,7 +46,7 @@ class AdamModel():
         self.client.close()
 
     def read_voltage(self):
-        """ reads the voltage off of ADAM-6024's inputs for channels 0-5.
+        """reads the voltage off of ADAM-6024's inputs for channels 0-5.
 
         Parameters
         ----------
@@ -52,9 +57,9 @@ class AdamModel():
         volts : List of floats
             the voltages on the ADAM's input channels
         """
-        if simulation_mode:
-            return [0,0,0,0,0,1.25]
-            
+        if self.simulation_mode:
+            return [0, 0, 0, 0, 0, 1.25]
+
         else:
             try:
                 readout = self.client.read_input_registers(0, 8, unit=1)
@@ -73,7 +78,7 @@ class AdamModel():
                 raise ConnectionException
 
     def counts_to_volts(self, counts):
-        """ converts discrete ADAM-6024 input readings into volts
+        """converts discrete ADAM-6024 input readings into volts
 
         Parameters
         ----------
@@ -85,5 +90,5 @@ class AdamModel():
         volts : float
             counts converted into voltage number
         """
-        ctv = self.range_size/65535
+        ctv = self.range_size / 65535
         return counts * ctv + self.range_start
