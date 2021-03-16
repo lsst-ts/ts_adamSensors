@@ -92,13 +92,10 @@ class AdamCSC(salobj.ConfigurableCsc):
 
         self.log.debug("hasPressure = " + str(hasPressure))
 
-        loop = asyncio.get_event_loop()
-        executor = concurrent.futures.ThreadPoolExecutor()
-
         outputs = [0, 0, 0, 0, 0, 0]
         self.log.debug("about to start telemetry loop")
         while True:
-            voltages = await loop.run_in_executor(executor, self.adam.read_voltage)
+            voltages = await self.adam.read_voltage
 
             # convert the voltage into whatever units, according to the
             # polynomial defined in configuration
