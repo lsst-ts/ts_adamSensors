@@ -1,6 +1,6 @@
 from pymodbus.client.asynchronous.tcp import AsyncModbusTCPClient as ModbusClient
 from pymodbus.exceptions import ConnectionException
-from mockModbus import MockModbusClient
+from .mockModbus import MockModbusClient
 import logging
 
 
@@ -39,7 +39,7 @@ class AdamModel:
         self.clientip = ip
         self.clientport = port
         if self.simulation_mode:
-            self.client = MockModbusClient(self.clientip, self.clientporty)
+            self.client = MockModbusClient(self.clientip, self.clientport)
         else:
             self.client = ModbusClient(self.clientip, self.clientport)
 
@@ -58,9 +58,9 @@ class AdamModel:
         volts : List of floats
             the voltages on the ADAM's input channels
         """
-       
+
         try:
-            readout = self.client.read_input_registers(0, 8, unit=1)
+            readout = await self.client.read_input_registers(0, 8, unit=1)
             return [self.counts_to_volts(r) for r in readout.registers]
         except AttributeError:
             # read_input_registers() *returns* (not raises) a

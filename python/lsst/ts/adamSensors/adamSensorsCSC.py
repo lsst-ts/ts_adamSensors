@@ -1,29 +1,25 @@
 from lsst.ts import salobj
 from lsst.ts.adamSensors.model import AdamModel
 from numpy import poly1d
-import pathlib
 import asyncio
-import concurrent
+from .config_schema import CONFIG_SCHEMA
+from .version import __version__
 
 
 class AdamCSC(salobj.ConfigurableCsc):
     """
     CSC for simple sensors connected to an ADAM controller
     """
+    version = __version__
+    valid_simulation_modes = (0, 1)
 
     def __init__(
         self, config_dir=None, initial_state=salobj.State.STANDBY, simulation_mode=0
     ):
-        schema_path = (
-            pathlib.Path(__file__)
-            .resolve()
-            .parents[4]
-            .joinpath("schema", "AdamSensors.yaml")
-        )
         super().__init__(
             "AdamSensors",
             index=0,
-            schema_path=schema_path,
+            config_schema=CONFIG_SCHEMA,
             config_dir=config_dir,
             initial_state=initial_state,
             simulation_mode=simulation_mode,
@@ -32,7 +28,6 @@ class AdamCSC(salobj.ConfigurableCsc):
         self.adam = None
         self.config = None
         self.start_timeout = 10
-        self.valid_simulation_modes = [0, 1]
 
         self.telemetry_loop_task = salobj.make_done_future()
 
@@ -44,7 +39,7 @@ class AdamCSC(salobj.ConfigurableCsc):
         self.cmd_start.ack_in_progress(data, timeout=self.start_timeout)
         await super().begin_start(data)
         self.adam = AdamModel(self.log, simulation_mode=self.simulation_mode)
-        self.adam.connect(self.params.ip, self.params.port)
+        await self.adam.connect(self.config.adam_ip, self.config.adam_port)
         self.telemetry_loop_task = asyncio.create_task(self.telemetry_loop())
 
     async def telemetry_loop(self):
@@ -95,7 +90,7 @@ class AdamCSC(salobj.ConfigurableCsc):
         outputs = [0, 0, 0, 0, 0, 0]
         self.log.debug("about to start telemetry loop")
         while True:
-            voltages = await self.adam.read_voltage
+            voltages = await self.adam.read_voltage()
 
             # convert the voltage into whatever units, according to the
             # polynomial defined in configuration
