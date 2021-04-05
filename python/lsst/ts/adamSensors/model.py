@@ -41,7 +41,10 @@ class AdamModel:
         if self.simulation_mode:
             self.client = MockModbusClient(self.clientip, self.clientport)
         else:
-            self.client = ModbusClient(self.clientip, self.clientport)
+            try:
+                self.client = ModbusClient(self.clientip, self.clientport)
+            except AttributeError:
+                raise ConnectionException
 
     async def disconnect(self):
         await self.client.close()

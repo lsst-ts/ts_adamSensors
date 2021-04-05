@@ -2,6 +2,7 @@ from lsst.ts import salobj
 from lsst.ts.adamSensors.model import AdamModel
 from numpy import poly1d
 import asyncio
+from pymodbus.exceptions import ConnectionException
 from .config_schema import CONFIG_SCHEMA
 from .version import __version__
 
@@ -39,8 +40,22 @@ class AdamCSC(salobj.ConfigurableCsc):
         self.cmd_start.ack_in_progress(data, timeout=self.start_timeout)
         await super().begin_start(data)
         self.adam = AdamModel(self.log, simulation_mode=self.simulation_mode)
-        await self.adam.connect(self.config.adam_ip, self.config.adam_port)
+        try:
+            await self.adam.connect(self.config.adam_ip, self.config.adam_port)
+        except ConnectionException:
+            self.fault(code=2, report="Unable to connect to modbus device at " + str(self.config.adam_ip))
+        if self.telemetry_loop_task.result() is not None:
+            self.telemetry_loop_task.cancel()
         self.telemetry_loop_task = asyncio.create_task(self.telemetry_loop())
+
+    async def end_standby(self, data):
+        """
+        When transitioning from disabled or fault state to standby,
+        cancels the telemetry loop task and disconnects from the ADAM
+        device.
+        """
+        self.telemetry_loop_task.cancel()
+        await self.model.disconnect()
 
     async def telemetry_loop(self):
         """
@@ -92,7 +107,7 @@ class AdamCSC(salobj.ConfigurableCsc):
         while True:
             voltages = await self.adam.read_voltage()
 
-            # convert the voltage into whatever units, according to the
+            # convert the voltage into appropriate units, according to the
             # polynomial defined in configuration
             for i in range(6):
                 outputs[i] = sensors[i][1](voltages[i])

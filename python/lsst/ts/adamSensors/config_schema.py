@@ -25,7 +25,9 @@ properties:
     type: string
     default: "None"
   analog_input_0_coefficients:
-    description: list of numbers defining, in descending order, the terms of a polynomial that maps voltages to the appropriate units
+    description: >-
+      list of numbers defining, in descending order, the terms of a polynomial that maps voltages
+      to the appropriate units. A value of [1., 0] here is a 1:1 linear mapping of volts to whatever.
     type: array
     items:
       type: number
@@ -35,7 +37,9 @@ properties:
     type: string
     default: "None"
   analog_input_1_coefficients:
-    description: list of numbers defining, in descending order, the terms of a polynomial that maps voltages to the appropriate units
+    description: >-
+      list of numbers defining, in descending order, the terms of a polynomial that maps voltages
+      to the appropriate units. A value of [1., 0] here is a 1:1 linear mapping of volts to whatever.
     type: array
     items:
       type: number
@@ -45,7 +49,9 @@ properties:
     type: string
     default: "None"
   analog_input_2_coefficients:
-    description: list of numbers defining, in descending order, the terms of a polynomial that maps voltages to the appropriate units
+    description: >-
+      list of numbers defining, in descending order, the terms of a polynomial that maps voltages
+      to the appropriate units. A value of [1., 0] here is a 1:1 linear mapping of volts to whatever.
     type: array
     items:
       type: number
@@ -55,7 +61,9 @@ properties:
     type: string
     default: "None"
   analog_input_3_coefficients:
-    description: list of numbers defining, in descending order, the terms of a polynomial that maps voltages to the appropriate units
+    description: >-
+      list of numbers defining, in descending order, the terms of a polynomial that maps voltages
+      to the appropriate units. A value of [1., 0] here is a 1:1 linear mapping of volts to whatever.
     type: array
     items:
       type: number
@@ -65,7 +73,9 @@ properties:
     type: string
     default: "None"
   analog_input_4_coefficients:
-    description: list of numbers defining, in descending order, the terms of a polynomial that maps voltages to the appropriate units
+    description: >-
+      list of numbers defining, in descending order, the terms of a polynomial that maps voltages
+      to the appropriate units. A value of [1., 0] here is a 1:1 linear mapping of volts to whatever.
     type: array
     items:
       type: number
@@ -75,7 +85,9 @@ properties:
     type: string
     default: "None"
   analog_input_5_coefficients:
-    description: list of numbers defining, in descending order, the terms of a polynomial that maps voltages to the appropriate units
+    description: >-
+      list of numbers defining, in descending order, the terms of a polynomial that maps voltages
+      to the appropriate units. A value of [1., 0] here is a 1:1 linear mapping of volts to whatever.
     type: array
     items:
       type: number

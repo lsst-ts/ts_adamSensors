@@ -23,7 +23,7 @@ class MockModbusClient():
                  the adam device.
         """
 
-        Fake_readout = namedtuple('Fake_readout', ['registers']) 
+        Fake_readout = namedtuple('Fake_readout', ['registers'])
         f = Fake_readout(registers=[sin(time()/10)*10, 0, -10, 10, -1.25, 3.14])
 
         return f

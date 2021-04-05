@@ -24,7 +24,7 @@ class CscTestCase(salobj.BaseCscTestCase, asynctest.TestCase):
             simulation_mode=1,
         ):
             await self.remote.cmd_start.set_start(
-                settingsToApply="homeoffice_pandemic_test.yaml"
+                settingsToApply="initial_test_config.yaml"
             )
 
 
