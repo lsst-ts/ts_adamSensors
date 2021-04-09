@@ -93,4 +93,3 @@ properties:
       type: number
     default: [344738., 0.]"""
 )
-"""Configuration schema as a constant."""

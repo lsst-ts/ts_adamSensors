@@ -43,7 +43,8 @@ class AdamCSC(salobj.ConfigurableCsc):
         try:
             await self.adam.connect(self.config.adam_ip, self.config.adam_port)
         except ConnectionException:
-            self.fault(code=2, report="Unable to connect to modbus device at " + str(self.config.adam_ip))
+            raise RuntimeError(f"Unable to connect to modbus device at {self.config.adam_ip}:\
+                {self.config.adam_port}.")
         if self.telemetry_loop_task.result() is not None:
             self.telemetry_loop_task.cancel()
         self.telemetry_loop_task = asyncio.create_task(self.telemetry_loop())
@@ -54,8 +55,11 @@ class AdamCSC(salobj.ConfigurableCsc):
         cancels the telemetry loop task and disconnects from the ADAM
         device.
         """
-        self.telemetry_loop_task.cancel()
-        await self.model.disconnect()
+        try:
+            self.telemetry_loop_task.cancel()
+            await self.model.disconnect()
+        except:
+            pass
 
     async def telemetry_loop(self):
         """
