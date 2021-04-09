@@ -34,20 +34,18 @@ class CscTestCase(salobj.BaseCscTestCase, asynctest.TestCase):
             simulation_mode=1,
         ):
             await salobj.set_summary_state(
-                self.remote, salobj.State.ENABLED,
-                settingsToApply="pytest_config.yaml"
+                self.remote, salobj.State.ENABLED, settingsToApply="pytest_config.yaml"
             )
             await self.assert_next_sample(
                 pressure_ch1=-10,
                 pressure_ch2=10,
                 topic=self.remote.tel_pressure,
-                flush=True
+                flush=True,
             )
 
             # check that our near-zero values are near-zero
             data = await self.assert_next_sample(
-                topic=self.remote.tel_pressure,
-                flush=True
+                topic=self.remote.tel_pressure, flush=True
             )
             self.assertAlmostEqual(data.pressure_ch3, 0, places=3)
             self.assertAlmostEqual(data.pressure_ch4, 0, places=3)
@@ -63,29 +61,26 @@ class CscTestCase(salobj.BaseCscTestCase, asynctest.TestCase):
             simulation_mode=1,
         ):
             await salobj.set_summary_state(
-                self.remote, salobj.State.ENABLED,
-                settingsToApply="pytest_config.yaml"
+                self.remote, salobj.State.ENABLED, settingsToApply="pytest_config.yaml"
             )
 
             pressure_data1 = await self.assert_next_sample(
-                topic=self.remote.tel_pressure,
-                flush=True
+                topic=self.remote.tel_pressure, flush=True
             )
             temp_data1 = await self.assert_next_sample(
-                topic=self.remote.tel_temperature,
-                flush=True
+                topic=self.remote.tel_temperature, flush=True
             )
             await asyncio.sleep(2)
             pressure_data2 = await self.assert_next_sample(
-                topic=self.remote.tel_pressure,
-                flush=True
+                topic=self.remote.tel_pressure, flush=True
             )
             temp_data2 = await self.assert_next_sample(
-                topic=self.remote.tel_temperature,
-                flush=True
+                topic=self.remote.tel_temperature, flush=True
             )
 
-            self.assertNotEqual(pressure_data1.pressure_ch0, pressure_data2.pressure_ch0)
+            self.assertNotEqual(
+                pressure_data1.pressure_ch0, pressure_data2.pressure_ch0
+            )
             self.assertNotEqual(temp_data1.temp_ch5, temp_data2.temp_ch5)
 
     async def test_bad_sensor_type(self):
@@ -96,8 +91,9 @@ class CscTestCase(salobj.BaseCscTestCase, asynctest.TestCase):
         ):
             with self.assertRaises(RuntimeError):
                 await salobj.set_summary_state(
-                    self.remote, salobj.State.ENABLED,
-                    settingsToApply="malformed_config.yaml"
+                    self.remote,
+                    salobj.State.ENABLED,
+                    settingsToApply="malformed_config.yaml",
                 )
 
 

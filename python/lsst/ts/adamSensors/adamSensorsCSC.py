@@ -130,7 +130,6 @@ class AdamCSC(salobj.ConfigurableCsc):
 
             # Assemble telemetry topics
             # Channel 0
-            self.log.info("sensors[0][0]: {")
             if sensors[0][0] == "Pressure":
                 self.tel_pressure.set(pressure_ch0=outputs[0])
             elif sensors[0][0] == "Temperature":
