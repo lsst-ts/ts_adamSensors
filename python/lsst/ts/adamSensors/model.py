@@ -44,8 +44,10 @@ class AdamModel:
             try:
                 self.client = ModbusClient(self.clientip, self.clientport)
             except AttributeError:
-                raise ConnectionException(f"Unable to connect to modbus device at {self.clientip}:\
-                    {self.clientport}")
+                raise ConnectionException(
+                    f"Unable to connect to modbus device at {self.clientip}:\
+                    {self.clientport}"
+                )
 
     async def disconnect(self):
         await self.client.close()
@@ -77,8 +79,10 @@ class AdamModel:
             # may see a fix in a future version, which may require
             # minor code changes on our part.
             # https://github.com/riptideio/pymodbus/issues/298
-            raise ConnectionException(f"Unable to reach modbus device at {self.clientip}:\
-                    {self.clientport}")
+            raise ConnectionException(
+                f"Unable to reach modbus device at {self.clientip}:\
+                    {self.clientport}"
+            )
 
     def counts_to_volts(self, counts):
         """converts discrete ADAM-6024 input readings into volts

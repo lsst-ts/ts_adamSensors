@@ -25,4 +25,4 @@ except ImportError:
 from .adamSensorsCSC import *
 from .mockModbus import *
 from .config_schema import *
-from .model import * 
+from .model import *

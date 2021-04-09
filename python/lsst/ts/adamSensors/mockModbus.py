@@ -3,7 +3,7 @@ from math import sin
 from collections import namedtuple
 
 
-class MockModbusClient():
+class MockModbusClient:
     def __init__(self, client, port):
         pass
 
@@ -23,8 +23,8 @@ class MockModbusClient():
                  the adam device.
         """
 
-        Fake_readout = namedtuple('Fake_readout', ['registers'])
-        f = Fake_readout(registers=[sin(time()%1/10)*10, 0, -10, 10, -1.25, 3.14])
+        Fake_readout = namedtuple("Fake_readout", ["registers"])
+        f = Fake_readout(registers=[sin(time() % 1 / 10) * 10, 0, -10, 10, -1.25, 3.14])
 
         return f
 

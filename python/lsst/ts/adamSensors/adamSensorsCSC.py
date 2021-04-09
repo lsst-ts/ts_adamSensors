@@ -11,6 +11,7 @@ class AdamCSC(salobj.ConfigurableCsc):
     """
     CSC for simple sensors connected to an ADAM controller
     """
+
     version = __version__
     valid_simulation_modes = (0, 1)
 
@@ -43,8 +44,10 @@ class AdamCSC(salobj.ConfigurableCsc):
         try:
             await self.adam.connect(self.config.adam_ip, self.config.adam_port)
         except ConnectionException:
-            raise RuntimeError(f"Unable to connect to modbus device at {self.config.adam_ip}:\
-                {self.config.adam_port}.")
+            raise RuntimeError(
+                f"Unable to connect to modbus device at "
+                f"{self.config.adam_ip}:{self.config.adam_port}."
+            )
         if self.telemetry_loop_task.result() is not None:
             self.telemetry_loop_task.cancel()
         self.telemetry_loop_task = asyncio.create_task(self.telemetry_loop())
@@ -55,11 +58,20 @@ class AdamCSC(salobj.ConfigurableCsc):
         cancels the telemetry loop task and disconnects from the ADAM
         device.
         """
-        try:
+        if not self.telemetry_loop_task.done():
             self.telemetry_loop_task.cancel()
-            await self.model.disconnect()
-        except:
+
+        try:
+            await self.telemetry_loop_task
+        except asyncio.CancelledError:
             pass
+        except Exception:
+            self.log.exception("Exception in telemetry loop.")
+
+        try:
+            await self.model.disconnect()
+        except Exception:
+            self.log.exception("Error disconnecting from controller.")
 
     async def telemetry_loop(self):
         """
