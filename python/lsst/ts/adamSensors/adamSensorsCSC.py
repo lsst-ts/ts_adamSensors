@@ -45,7 +45,7 @@ class AdamCSC(salobj.ConfigurableCsc):
             await self.adam.connect(self.config.adam_ip, self.config.adam_port)
         except ConnectionException:
             raise RuntimeError(
-                f"Unable to connect to modbus device at "
+                "Unable to connect to modbus device at "
                 f"{self.config.adam_ip}:{self.config.adam_port}."
             )
         if self.telemetry_loop_task.result() is not None:
