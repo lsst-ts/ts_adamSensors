@@ -1,9 +1,10 @@
 from lsst.ts import salobj
 from lsst.ts.adamSensors.model import AdamModel
 from numpy import poly1d
-import pathlib
 import asyncio
-import concurrent
+from pymodbus.exceptions import ConnectionException
+from .config_schema import CONFIG_SCHEMA
+from .version import __version__
 
 
 class AdamCSC(salobj.ConfigurableCsc):
@@ -11,19 +12,16 @@ class AdamCSC(salobj.ConfigurableCsc):
     CSC for simple sensors connected to an ADAM controller
     """
 
+    version = __version__
+    valid_simulation_modes = (0, 1)
+
     def __init__(
         self, config_dir=None, initial_state=salobj.State.STANDBY, simulation_mode=0
     ):
-        schema_path = (
-            pathlib.Path(__file__)
-            .resolve()
-            .parents[4]
-            .joinpath("schema", "AdamSensors.yaml")
-        )
         super().__init__(
             "AdamSensors",
             index=0,
-            schema_path=schema_path,
+            config_schema=CONFIG_SCHEMA,
             config_dir=config_dir,
             initial_state=initial_state,
             simulation_mode=simulation_mode,
@@ -32,7 +30,6 @@ class AdamCSC(salobj.ConfigurableCsc):
         self.adam = None
         self.config = None
         self.start_timeout = 10
-        self.valid_simulation_modes = [0, 1]
 
         self.telemetry_loop_task = salobj.make_done_future()
 
@@ -44,8 +41,37 @@ class AdamCSC(salobj.ConfigurableCsc):
         self.cmd_start.ack_in_progress(data, timeout=self.start_timeout)
         await super().begin_start(data)
         self.adam = AdamModel(self.log, simulation_mode=self.simulation_mode)
-        self.adam.connect(self.params.ip, self.params.port)
+        try:
+            await self.adam.connect(self.config.adam_ip, self.config.adam_port)
+        except ConnectionException:
+            raise RuntimeError(
+                "Unable to connect to modbus device at "
+                f"{self.config.adam_ip}:{self.config.adam_port}."
+            )
+        if self.telemetry_loop_task.result() is not None:
+            self.telemetry_loop_task.cancel()
         self.telemetry_loop_task = asyncio.create_task(self.telemetry_loop())
+
+    async def end_standby(self, data):
+        """
+        When transitioning from disabled or fault state to standby,
+        cancels the telemetry loop task and disconnects from the ADAM
+        device.
+        """
+        if not self.telemetry_loop_task.done():
+            self.telemetry_loop_task.cancel()
+
+        try:
+            await self.telemetry_loop_task
+        except asyncio.CancelledError:
+            pass
+        except Exception:
+            self.log.exception("Exception in telemetry loop.")
+
+        try:
+            await self.model.disconnect()
+        except Exception:
+            self.log.exception("Error disconnecting from controller.")
 
     async def telemetry_loop(self):
         """
@@ -92,15 +118,12 @@ class AdamCSC(salobj.ConfigurableCsc):
 
         self.log.debug("hasPressure = " + str(hasPressure))
 
-        loop = asyncio.get_event_loop()
-        executor = concurrent.futures.ThreadPoolExecutor()
-
         outputs = [0, 0, 0, 0, 0, 0]
         self.log.debug("about to start telemetry loop")
         while True:
-            voltages = await loop.run_in_executor(executor, self.adam.read_voltage)
+            voltages = await self.adam.read_voltage()
 
-            # convert the voltage into whatever units, according to the
+            # convert the voltage into appropriate units, according to the
             # polynomial defined in configuration
             for i in range(6):
                 outputs[i] = sensors[i][1](voltages[i])
