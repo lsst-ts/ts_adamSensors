@@ -24,7 +24,7 @@ class MockModbusClient:
         """
 
         Fake_readout = namedtuple("Fake_readout", ["registers"])
-        f = Fake_readout(registers=[sin(time() % 1 / 10) * 10, 0, -10, 10, -1.25, 3.14])
+        f = Fake_readout(registers=[sin(time() / 10) * 10, 0, -10, 10, -1.25, 3.14])
 
         return f
 
