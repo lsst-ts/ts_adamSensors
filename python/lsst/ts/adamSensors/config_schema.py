@@ -24,6 +24,7 @@ properties:
     description: Type of sensor connected to ADAM AO-0. Can be "None", "Temperature", or "Pressure".
     type: string
     default: "None"
+    enum: ["Temperature", "Pressure", "None"]
   analog_input_0_coefficients:
     description: >-
       list of numbers defining, in descending order, the terms of a polynomial that maps voltages
@@ -36,6 +37,7 @@ properties:
     description: Type of sensor connected to ADAM AO-1. Can be "None", "Temperature", or "Pressure".
     type: string
     default: "None"
+    enum: ["Temperature", "Pressure", "None"]
   analog_input_1_coefficients:
     description: >-
       list of numbers defining, in descending order, the terms of a polynomial that maps voltages
@@ -48,6 +50,7 @@ properties:
     description: Type of sensor connected to ADAM AO-2. Can be "None", "Temperature", or "Pressure".
     type: string
     default: "None"
+    enum: ["Temperature", "Pressure", "None"]
   analog_input_2_coefficients:
     description: >-
       list of numbers defining, in descending order, the terms of a polynomial that maps voltages
@@ -60,6 +63,7 @@ properties:
     description: Type of sensor connected to ADAM AO-3. Can be "None", "Temperature", or "Pressure".
     type: string
     default: "None"
+    enum: ["Temperature", "Pressure", "None"]
   analog_input_3_coefficients:
     description: >-
       list of numbers defining, in descending order, the terms of a polynomial that maps voltages
@@ -72,6 +76,7 @@ properties:
     description: Type of sensor connected to ADAM AO-4. Can be "None", "Temperature", or "Pressure".
     type: string
     default: "None"
+    enum: ["Temperature", "Pressure", "None"]
   analog_input_4_coefficients:
     description: >-
       list of numbers defining, in descending order, the terms of a polynomial that maps voltages
@@ -84,6 +89,7 @@ properties:
     description: Type of sensor connected to ADAM AO-5. Can be "None", "Temperature", or "Pressure".
     type: string
     default: "None"
+    enum: ["Temperature", "Pressure", "None"]
   analog_input_5_coefficients:
     description: >-
       list of numbers defining, in descending order, the terms of a polynomial that maps voltages
