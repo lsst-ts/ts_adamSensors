@@ -15,13 +15,12 @@ build:
     - OSPL_HOME
     - PYTHON_BUILD_VERSION
     - PYTHON_BUILD_LOCATION
-    - TS_CONFIG_ATTCS_DIR
+    - TS_CONFIG_EAS_DIR
     - LSST_DDS_DOMAIN
 
 test:
   requires:
     - ts-conda-build =0.3
-    - ts-simactuators
     - ts-dds
     - ts-idl {{ idl_version }}
     - ts-salobj {{ salobj_version }}
