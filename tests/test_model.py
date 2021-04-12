@@ -1,10 +1,10 @@
-import asynctest
+import unittest
 import asyncio
 import pytest
 from lsst.ts import adamSensors
 
 
-class ModelTestCase(asynctest.TestCase):
+class ModelTestCase(unittest.IsolatedAsyncioTestCase):
     async def test_connect(self):
         m = adamSensors.AdamModel(simulation_mode=True)
         await m.connect("fakeIP", 502)
@@ -25,3 +25,7 @@ class ModelTestCase(asynctest.TestCase):
         await asyncio.sleep(2)
         v2 = await m.read_voltage()
         assert v1[0] != v2[0]
+
+
+if __name__ == "__main__":
+    unittest.main()

@@ -1,5 +1,4 @@
 import unittest
-import asynctest
 import asyncio
 import pathlib
 
@@ -11,7 +10,7 @@ STD_TIMEOUT = 15  # standard command timeout (sec)
 TEST_CONFIG_DIR = pathlib.Path(__file__).parents[1].joinpath("tests", "data", "config")
 
 
-class CscTestCase(salobj.BaseCscTestCase, asynctest.TestCase):
+class CscTestCase(salobj.BaseCscTestCase, unittest.IsolatedAsyncioTestCase):
     def basic_make_csc(self, initial_state, config_dir, simulation_mode):
         return adamSensors.adamSensorsCSC.AdamCSC(
             initial_state=initial_state,

@@ -33,4 +33,12 @@ class MockModbusClient:
         pass
 
     def _sin(self, period):
-        return abs(sin(time() / period) * 65535)
+        """
+        Uses math.sin() to simulate a sensor that is reading
+        variable voltage off the modbus device.
+
+        Parameters:
+        -----------
+        period: adjust the period of he variability
+        """
+        return abs(sin(time() / period) * 65535.)
