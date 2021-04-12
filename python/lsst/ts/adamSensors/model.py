@@ -29,7 +29,6 @@ class AdamModel:
         self.client = None
         self.clientip = None
         self.clientport = None
-        self.log = log
 
         self.range_size = 20
         self.range_start = -10  # zero point offset for the ADAM device
@@ -64,10 +63,10 @@ class AdamModel:
         volts : List of floats
             the voltages on the ADAM's input channels
         """
-
         try:
             readout = await self.client.read_input_registers(0, 8, unit=1)
-            return [self.counts_to_volts(r) for r in readout.registers]
+            voltages = [self.counts_to_volts(r) for r in readout.registers]
+            return voltages
         except AttributeError:
             # read_input_registers() *returns* (not raises) a
             # ModbusIOException in the event of loss of ADAM network

@@ -69,7 +69,7 @@ class AdamCSC(salobj.ConfigurableCsc):
             self.log.exception("Exception in telemetry loop.")
 
         try:
-            await self.model.disconnect()
+            await self.adam.disconnect()
         except Exception:
             self.log.exception("Error disconnecting from controller.")
 
