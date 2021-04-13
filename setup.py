@@ -22,7 +22,7 @@ base_prefix = pathlib.PurePosixPath(sys.base_prefix)
 data_files_path = tools_path.relative_to(base_prefix).parents[1]
 
 setuptools.setup(
-    name="ts-adamSensors",
+    name="ts-adamsensors",
     use_scm_version={
         "write_to": "python/lsst/ts/adamSensors/version.py",
         "write_to_template": scm_version_template,
