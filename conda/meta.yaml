@@ -39,9 +39,9 @@ requirements:
     - setuptools_scm
     - setuptools
     - pytest-runner
-    - pymodbus
   run:
     - python
     - setuptools
     - setuptools_scm
     - ts-salobj
+    - pymodbus
