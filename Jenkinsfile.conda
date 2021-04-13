@@ -1,2 +1,2 @@
 @Library('JenkinsShared')_
-CondaPipeline(["ts_config_eas"], "ts-adamSensors", "lsst.ts.adamSensors")
+CondaPipeline(["ts_config_eas"], "ts-adamsensors", "lsst.ts.adamSensors")
