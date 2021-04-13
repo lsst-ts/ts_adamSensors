@@ -41,4 +41,4 @@ class MockModbusClient:
         -----------
         period: adjust the period of he variability
         """
-        return abs(sin(time() / period) * 65535.)
+        return abs(sin(time() / period) * 65535.0)
