@@ -3,4 +3,4 @@ ts_adamSensors
 #################
 
 
-Provides the ability to read temperatures and pressures from transducer type sensors connected to an ADAM-6024 or similar modbus device. The configuration allows you to specify which type of devices are on which channels, and then the analog signal on that channel is converted to a user-specified range of possible values.
+Provides the ability to read temperatures and pressures from transducer type sensors connected to an ADAM-6024 or similar modbus device. For each of the ADAM's six channels, the configuration file allows you to set a device type of "Temperature" "Pressure" or "None", and to specify a polynomial function to map the voltage readings (in the range of -10 to 10) onto degrees C or pascals.

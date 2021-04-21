@@ -4,7 +4,7 @@ from numpy import poly1d
 import asyncio
 from pymodbus.exceptions import ConnectionException
 from .config_schema import CONFIG_SCHEMA
-from .version import __version__
+from . import __version__
 
 
 class AdamCSC(salobj.ConfigurableCsc):
