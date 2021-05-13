@@ -1,6 +1,7 @@
 from pymodbus.client.asynchronous.tcp import AsyncModbusTCPClient as ModbusClient
 from pymodbus.exceptions import ConnectionException
 from .mockModbus import MockModbusClient
+from pymodbus.client.asynchronous import schedulers
 import logging
 
 
@@ -41,7 +42,7 @@ class AdamModel:
             self.client = MockModbusClient(self.clientip, self.clientport)
         else:
             try:
-                self.client = ModbusClient(self.clientip, self.clientport)
+                self.client = ModbusClient(schedulers.ASYNC_IO, self.clientip, self.clientport)
             except AttributeError:
                 raise ConnectionException(
                     "Unable to connect to modbus device at "
