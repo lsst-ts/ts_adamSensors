@@ -54,6 +54,9 @@ class AdamCSC(salobj.ConfigurableCsc):
                 "Unable to connect to modbus device at "
                 f"{self.config.adam_ip}:{self.config.adam_port}."
             )
+        except Exception as e:
+            self.log.exception("Error connecting to modbus.")
+            raise e
         self.log.debug("connected")
         if self.telemetry_loop_task.result() is not None:
             self.telemetry_loop_task.cancel()
