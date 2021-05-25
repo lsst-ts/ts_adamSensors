@@ -43,14 +43,16 @@ class AdamModel:
             self.client = MockModbusClient(self.clientip, self.clientport)
         else:
             try:
+                self.log.debug("creating modbus client")
                 self.client = ModbusClient(
                     schedulers.ASYNC_IO,
                     self.clientip,
                     self.clientport,
                     loop=asyncio.get_running_loop()
                 )
+                self.log.debug("mb client created")
             except AttributeError:
-                self.log.debug(a)
+                self.log.debug("there was an AttributeError")
                 raise ConnectionException(
                     "Unable to connect to modbus device at "
                     f"{self.clientip}:{self.clientport}."
