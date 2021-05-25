@@ -2,6 +2,7 @@ from pymodbus.client.asynchronous.tcp import AsyncModbusTCPClient as ModbusClien
 from pymodbus.exceptions import ConnectionException
 from .mockModbus import MockModbusClient
 from pymodbus.client.asynchronous import schedulers
+from threading import Thread
 import logging
 import asyncio
 
@@ -24,6 +25,20 @@ class AdamModel:
     """
 
     def __init__(self, ip, port, log=None, simulation_mode=False):
+        def start_loop(loop):
+            """
+            Start Loop
+            :param loop:
+            :return:
+            """
+            asyncio.set_event_loop(loop)
+            loop.run_forever()
+        loop = asyncio.new_event_loop()
+
+        t = Thread(target=start_loop, args=[loop])
+        t.daemon = True
+        # Start the loop
+        t.start()
         if log is None:
             self.log = logging.getLogger(type(self).__name__)
         else:
@@ -32,8 +47,11 @@ class AdamModel:
             self.client = MockModbusClient(ip, port)
         else:
             try:
+                
                 self.log.debug("creating modbus client")
-                loop, self.client = ModbusClient(schedulers.ASYNC_IO, ip, port, loop=asyncio.get_running_loop())
+                loop, self.client = ModbusClient(
+                    schedulers.ASYNC_IO, ip, port, loop=loop
+                )
                 self.log.debug("mb client created")
             except AttributeError:
                 self.log.debug("there was an AttributeError")
