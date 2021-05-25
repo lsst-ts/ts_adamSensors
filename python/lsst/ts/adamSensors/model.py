@@ -47,8 +47,7 @@ class AdamModel:
                 self.client = ModbusClient(
                     schedulers.ASYNC_IO,
                     self.clientip,
-                    self.clientport,
-                    loop=asyncio.get_running_loop()
+                    self.clientport
                 )
                 self.log.debug("mb client created")
             except AttributeError:
