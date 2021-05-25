@@ -33,7 +33,7 @@ class AdamModel:
         else:
             try:
                 self.log.debug("creating modbus client")
-                self.client = ModbusClient(schedulers.ASYNC_IO, ip, port, loop=asyncio.get_running_loop())
+                loop, self.client = ModbusClient(schedulers.ASYNC_IO, ip, port, loop=asyncio.get_running_loop())
                 self.log.debug("mb client created")
             except AttributeError:
                 self.log.debug("there was an AttributeError")
