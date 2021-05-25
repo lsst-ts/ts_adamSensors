@@ -31,6 +31,8 @@ class AdamCSC(salobj.ConfigurableCsc):
         self.log.addHandler(logging.StreamHandler())
         self.log.setLevel(logging.DEBUG)
 
+        self.loop = asyncio.get_running_loop()
+
         self.adam = None
         self.config = None
         self.start_timeout = 10
@@ -49,6 +51,7 @@ class AdamCSC(salobj.ConfigurableCsc):
             self.adam = AdamModel(
                 self.config.adam_ip,
                 self.config.adam_port,
+                self.loop,
                 log=self.log,
                 simulation_mode=self.simulation_mode,
             )

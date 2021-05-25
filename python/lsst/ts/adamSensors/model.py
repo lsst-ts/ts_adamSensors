@@ -24,21 +24,8 @@ class AdamModel:
             the pymodbus object representing the ADAM 6024
     """
 
-    def __init__(self, ip, port, log=None, simulation_mode=False):
-        def start_loop(loop):
-            """
-            Start Loop
-            :param loop:
-            :return:
-            """
-            asyncio.set_event_loop(loop)
-            loop.run_forever()
-        loop = asyncio.new_event_loop()
+    def __init__(self, ip, port, loop, log=None, simulation_mode=False):
 
-        t = Thread(target=start_loop, args=[loop])
-        t.daemon = True
-        # Start the loop
-        t.start()
         if log is None:
             self.log = logging.getLogger(type(self).__name__)
         else:
@@ -47,7 +34,7 @@ class AdamModel:
             self.client = MockModbusClient(ip, port)
         else:
             try:
-                
+
                 self.log.debug("creating modbus client")
                 loop, self.client = ModbusClient(
                     schedulers.ASYNC_IO, ip, port, loop=loop
@@ -65,6 +52,7 @@ class AdamModel:
 
     async def disconnect(self):
         await self.client.close()
+        self.t.close()
 
     async def read_voltage(self):
         """reads the voltage off of ADAM-6024's inputs for channels 0-5.
@@ -79,7 +67,7 @@ class AdamModel:
             the voltages on the ADAM's input channels
         """
         try:
-            readout = await self.client.read_input_registers(0, 8, unit=1)
+            readout = await self.client.protocol.read_input_registers(0, 8, unit=1)
             voltages = [self.counts_to_volts(r) for r in readout.registers]
             return voltages
         except AttributeError:
