@@ -45,10 +45,14 @@ class AdamCSC(salobj.ConfigurableCsc):
         self.cmd_start.ack_in_progress(data, timeout=self.start_timeout)
         await super().begin_start(data)
         self.log.debug("done with begin_start super")
-        self.adam = AdamModel(self.log, simulation_mode=self.simulation_mode)
-        self.log.debug("model created")
         try:
-            await self.adam.connect(self.config.adam_ip, self.config.adam_port)
+            self.adam = AdamModel(
+                self.config.adam_ip,
+                self.config.adam_port,
+                log=self.log,
+                simulation_mode=self.simulation_mode,
+            )
+            self.log.debug("model created")
         except ConnectionException:
             raise RuntimeError(
                 "Unable to connect to modbus device at "

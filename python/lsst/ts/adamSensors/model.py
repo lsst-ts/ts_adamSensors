@@ -23,32 +23,17 @@ class AdamModel:
             the pymodbus object representing the ADAM 6024
     """
 
-    def __init__(self, log=None, simulation_mode=False):
+    def __init__(self, ip, port, log=None, simulation_mode=False):
         if log is None:
             self.log = logging.getLogger(type(self).__name__)
         else:
             self.log = log.getChild(type(self).__name__)
-        self.client = None
-        self.clientip = None
-        self.clientport = None
-
-        self.range_size = 20
-        self.range_start = -10  # zero point offset for the ADAM device
-        self.simulation_mode = simulation_mode
-
-    async def connect(self, ip, port):
-        self.clientip = ip
-        self.clientport = port
         if self.simulation_mode:
-            self.client = MockModbusClient(self.clientip, self.clientport)
+            self.client = MockModbusClient(ip, port)
         else:
             try:
                 self.log.debug("creating modbus client")
-                self.client = ModbusClient(
-                    schedulers.ASYNC_IO,
-                    self.clientip,
-                    self.clientport
-                )
+                self.client = ModbusClient(schedulers.ASYNC_IO, ip, port)
                 self.log.debug("mb client created")
             except AttributeError:
                 self.log.debug("there was an AttributeError")
@@ -56,6 +41,10 @@ class AdamModel:
                     "Unable to connect to modbus device at "
                     f"{self.clientip}:{self.clientport}."
                 )
+
+        self.range_size = 20
+        self.range_start = -10  # zero point offset for the ADAM device
+        self.simulation_mode = simulation_mode
 
     async def disconnect(self):
         await self.client.close()
