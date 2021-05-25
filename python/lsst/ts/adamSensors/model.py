@@ -47,9 +47,10 @@ class AdamModel:
                     schedulers.ASYNC_IO,
                     self.clientip,
                     self.clientport,
-                    loop=asyncio.get_event_loop()
+                    loop=asyncio.get_running_loop()
                 )
             except AttributeError:
+                self.log.debug(a)
                 raise ConnectionException(
                     "Unable to connect to modbus device at "
                     f"{self.clientip}:{self.clientport}."
