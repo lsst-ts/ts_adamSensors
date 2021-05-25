@@ -28,7 +28,7 @@ class AdamModel:
             self.log = logging.getLogger(type(self).__name__)
         else:
             self.log = log.getChild(type(self).__name__)
-        if self.simulation_mode:
+        if simulation_mode:
             self.client = MockModbusClient(ip, port)
         else:
             try:
@@ -44,7 +44,6 @@ class AdamModel:
 
         self.range_size = 20
         self.range_start = -10  # zero point offset for the ADAM device
-        self.simulation_mode = simulation_mode
 
     async def disconnect(self):
         await self.client.close()
