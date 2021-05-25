@@ -51,7 +51,6 @@ class AdamCSC(salobj.ConfigurableCsc):
             self.adam = AdamModel(
                 self.config.adam_ip,
                 self.config.adam_port,
-                self.loop,
                 log=self.log,
                 simulation_mode=self.simulation_mode,
             )

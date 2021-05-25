@@ -24,8 +24,22 @@ class AdamModel:
             the pymodbus object representing the ADAM 6024
     """
 
-    def __init__(self, ip, port, loop, log=None, simulation_mode=False):
+    def __init__(self, ip, port, log=None, simulation_mode=False):
+        def start_loop(loop):
+            """
+            Start Loop
+            :param loop:
+            :return:
+            """
+            asyncio.set_event_loop(loop)
+            loop.run_forever()
 
+        loop = asyncio.new_event_loop()
+
+        self.t = Thread(target=start_loop, args=[loop])
+        self.t.daemon = True
+        # Start the loop
+        self.t.start()
         if log is None:
             self.log = logging.getLogger(type(self).__name__)
         else:
