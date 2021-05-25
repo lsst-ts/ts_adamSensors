@@ -2,6 +2,7 @@ from lsst.ts import salobj
 from lsst.ts.adamSensors.model import AdamModel
 from numpy import poly1d
 import asyncio
+import logging
 from pymodbus.exceptions import ConnectionException
 from .config_schema import CONFIG_SCHEMA
 from . import __version__
@@ -27,6 +28,9 @@ class AdamCSC(salobj.ConfigurableCsc):
             simulation_mode=simulation_mode,
         )
 
+        self.log.addHandler(logging.StreamHandler())
+        self.log.setLevel(logging.DEBUG)
+
         self.adam = None
         self.config = None
         self.start_timeout = 10
@@ -40,7 +44,9 @@ class AdamCSC(salobj.ConfigurableCsc):
         """
         self.cmd_start.ack_in_progress(data, timeout=self.start_timeout)
         await super().begin_start(data)
+        self.log.debug("done with begin_start super")
         self.adam = AdamModel(self.log, simulation_mode=self.simulation_mode)
+        self.log.debug("model created")
         try:
             await self.adam.connect(self.config.adam_ip, self.config.adam_port)
         except ConnectionException:
@@ -50,6 +56,7 @@ class AdamCSC(salobj.ConfigurableCsc):
             )
         if self.telemetry_loop_task.result() is not None:
             self.telemetry_loop_task.cancel()
+            self.log.debug("starting telemetry loop")
         self.telemetry_loop_task = asyncio.create_task(self.telemetry_loop())
 
     async def end_standby(self, data):
