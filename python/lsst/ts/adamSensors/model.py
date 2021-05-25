@@ -47,7 +47,7 @@ class AdamModel:
                     schedulers.ASYNC_IO,
                     self.clientip,
                     self.clientport,
-                    loop=asyncio.get_running_loop()
+                    loop=asyncio.get_event_loop()
                 )
             except AttributeError:
                 raise ConnectionException(
