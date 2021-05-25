@@ -54,10 +54,12 @@ class AdamCSC(salobj.ConfigurableCsc):
                 "Unable to connect to modbus device at "
                 f"{self.config.adam_ip}:{self.config.adam_port}."
             )
+        self.log.debug("connected")
         if self.telemetry_loop_task.result() is not None:
             self.telemetry_loop_task.cancel()
             self.log.debug("starting telemetry loop")
         self.telemetry_loop_task = asyncio.create_task(self.telemetry_loop())
+        self.log.debug("end of begin_start")
 
     async def end_standby(self, data):
         """
