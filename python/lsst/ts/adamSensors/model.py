@@ -34,9 +34,9 @@ class AdamModel:
             asyncio.set_event_loop(loop)
             loop.run_forever()
 
-        loop = asyncio.new_event_loop()
+        self.loop = asyncio.new_event_loop()
 
-        self.t = Thread(target=start_loop, args=[loop])
+        self.t = Thread(target=start_loop, args=[self.loop])
         self.t.daemon = True
         # Start the loop
         self.t.start()
@@ -48,14 +48,10 @@ class AdamModel:
             self.client = MockModbusClient(ip, port)
         else:
             try:
-
-                self.log.debug("creating modbus client")
                 loop, self.client = ModbusClient(
-                    schedulers.ASYNC_IO, ip, port, loop=loop
+                    schedulers.ASYNC_IO, ip, port, loop=self.loop
                 )
-                self.log.debug("mb client created")
             except AttributeError:
-                self.log.debug("there was an AttributeError")
                 raise ConnectionException(
                     "Unable to connect to modbus device at "
                     f"{self.clientip}:{self.clientport}."
@@ -67,6 +63,7 @@ class AdamModel:
     async def disconnect(self):
         await self.client.close()
         self.t.close()
+        self.loop.close()
 
     async def read_voltage(self):
         """reads the voltage off of ADAM-6024's inputs for channels 0-5.
