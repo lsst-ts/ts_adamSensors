@@ -61,7 +61,7 @@ class AdamModel:
         self.range_start = -10  # zero point offset for the ADAM device
 
     async def disconnect(self):
-        await self.client.close()
+        await self.client.stop()
         self.t.close()
         self.loop.close()
 
