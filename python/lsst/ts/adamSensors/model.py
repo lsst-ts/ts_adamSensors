@@ -70,7 +70,6 @@ class AdamModel:
         self.log.debug(self.client)
         self.log.debug(self.client.stop())
         self.client.stop()
-        self.t.close()
         self.loop.close()
 
     async def read_voltage(self):
