@@ -61,7 +61,9 @@ class AdamCSC(salobj.ConfigurableCsc):
                 self.log.debug(f"connected to modbus device at {self.config.adam_ip}")
                 if self.telemetry_loop_task.done():
                     self.log.debug("starting telemetry loop")
-                    self.telemetry_loop_task = asyncio.create_task(self.telemetry_loop())
+                    self.telemetry_loop_task = asyncio.create_task(
+                        self.telemetry_loop()
+                    )
             self.log.debug("done setting up CSC for disabled or enabled state")
         else:
             if not self.telemetry_loop_task.done():
@@ -71,11 +73,11 @@ class AdamCSC(salobj.ConfigurableCsc):
             except asyncio.CancelledError:
                 pass
             except Exception:
-                self.log.exception(f"Exception in telemetry loop while in state {self.summary_state}")
-            try:
+                self.log.exception(
+                    f"Exception awaiting telemetry loop while in state {self.summary_state}"
+                )
+            if self.adam is not None:
                 await self.adam.disconnect()
-            except Exception:
-                self.log.exception("Error disconnecting from controller.")
 
     async def telemetry_loop(self):
         """
