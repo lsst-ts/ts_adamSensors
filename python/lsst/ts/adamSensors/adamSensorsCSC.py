@@ -78,6 +78,7 @@ class AdamCSC(salobj.ConfigurableCsc):
                 )
             if self.adam is not None:
                 await self.adam.disconnect()
+                self.adam = None
 
     async def telemetry_loop(self):
         """

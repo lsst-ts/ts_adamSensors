@@ -37,6 +37,7 @@ class AdamModel:
         self.loop = asyncio.new_event_loop()
         self.clientip = ip
         self.clientport = port
+        self.client = None
 
         self.t = Thread(target=start_loop, args=[self.loop])
         self.t.daemon = True
@@ -66,7 +67,8 @@ class AdamModel:
         self.log.debug(type(self.client))
         self.log.debug(dir(self.client))
         self.log.debug(f"connected = {self.client.connected}")
-        await self.client.stop()
+        if self.client is not None:
+            await self.client.stop()
         self.t.close()
         self.loop.close()
 
