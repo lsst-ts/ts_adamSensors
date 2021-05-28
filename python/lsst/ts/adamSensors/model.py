@@ -65,7 +65,7 @@ class AdamModel:
     async def disconnect(self):
         self.log.debug(type(self.client))
         self.log.debug(dir(self.client))
-        self.log.debug(f"connected = {self.client.connected()}")
+        self.log.debug(f"connected = {self.client.connected}")
         await self.client.stop()
         self.t.close()
         self.loop.close()
