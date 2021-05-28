@@ -67,8 +67,9 @@ class AdamModel:
         self.log.debug(type(self.client))
         self.log.debug(dir(self.client))
         self.log.debug(f"connected = {self.client.connected}")
-        if self.client is not None:
-            await self.client.stop()
+        self.log.debug(self.client)
+        self.log.debug(self.client.stop())
+        self.client.stop()
         self.t.close()
         self.loop.close()
 
