@@ -64,11 +64,7 @@ class AdamModel:
         self.range_start = -10  # zero point offset for the ADAM device
 
     async def disconnect(self):
-        self.log.debug(f"connected = {self.client.connected}")
-        self.log.debug(self.client)
-        self.log.debug(self.client.stop())
-        self.client.stop()
-        self.loop.close()
+        self.client.stop() # is this all that is needed to clean up after threads?
 
     async def read_voltage(self):
         """reads the voltage off of ADAM-6024's inputs for channels 0-5.
@@ -85,7 +81,6 @@ class AdamModel:
         try:
             readout = await self.client.protocol.read_input_registers(0, 8, unit=1)
             voltages = [self.counts_to_volts(r) for r in readout.registers]
-            self.log.debug(f"read voltages: {voltages}")
             return voltages
         except AttributeError as e:
             self.log.debug(e)
