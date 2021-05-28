@@ -58,7 +58,8 @@ class AdamCSC(salobj.ConfigurableCsc):
                 except Exception as e:
                     self.log.exception("Error connecting to modbus.")
                     raise e
-                self.log.debug(f"connected to modbus device at {self.config.adam_ip}")
+                self.log.debug(f"connected to modbus device at {self.adam.clientip}")
+                self.log.debug(f"connected to modbus device at {self.adam.client.host}")
                 if self.telemetry_loop_task.done():
                     self.log.debug("starting telemetry loop")
                     self.telemetry_loop_task = asyncio.create_task(
