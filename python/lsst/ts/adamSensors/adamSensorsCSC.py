@@ -84,7 +84,7 @@ class AdamCSC(salobj.ConfigurableCsc):
         except asyncio.CancelledError:
             pass
         except Exception:
-            self.log.exception("Exception in telemetry loop.")
+            self.log.exception(f"Exception in telemetry loop while in state {self.summary_state}")
 
         try:
             await self.adam.disconnect()

@@ -35,6 +35,8 @@ class AdamModel:
             loop.run_forever()
 
         self.loop = asyncio.new_event_loop()
+        self.clientip = ip
+        self.clientport = port
 
         self.t = Thread(target=start_loop, args=[self.loop])
         self.t.daemon = True
@@ -63,6 +65,7 @@ class AdamModel:
     async def disconnect(self):
         self.log.debug(type(self.client))
         self.log.debug(dir(self.client))
+        self.log.debug(f"connected = {self.client.connected()}")
         await self.client.stop()
         self.t.close()
         self.loop.close()
