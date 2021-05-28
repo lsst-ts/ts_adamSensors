@@ -128,6 +128,9 @@ class AdamCSC(salobj.ConfigurableCsc):
         outputs = [0, 0, 0, 0, 0, 0]
         self.log.debug("about to start telemetry loop")
         while True:
+            if self.adam is None:
+                break
+
             voltages = await self.adam.read_voltage()
 
             # convert the voltage into appropriate units, according to the
@@ -181,6 +184,7 @@ class AdamCSC(salobj.ConfigurableCsc):
                 self.tel_temperature.put()
 
             await asyncio.sleep(self.heartbeat_interval)
+        self.log.debug("aborted loop because the model was None")
 
     @staticmethod
     def get_config_pkg():
