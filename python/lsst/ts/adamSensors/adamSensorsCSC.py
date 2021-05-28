@@ -39,57 +39,43 @@ class AdamCSC(salobj.ConfigurableCsc):
 
         self.telemetry_loop_task = salobj.make_done_future()
 
-    async def begin_start(self, data):
-        """
-        Sets up the model which communicates with the ADAM hardware, and
-        initiates the telemetry publishing loop
-        """
-        self.cmd_start.ack_in_progress(data, timeout=self.start_timeout)
-        await super().begin_start(data)
-        self.log.debug("done with begin_start super")
-        try:
-            self.adam = AdamModel(
-                self.config.adam_ip,
-                self.config.adam_port,
-                log=self.log,
-                simulation_mode=self.simulation_mode,
-            )
-            self.log.debug("model created")
-        except ConnectionException:
-            raise RuntimeError(
-                "Unable to connect to modbus device at "
-                f"{self.config.adam_ip}:{self.config.adam_port}."
-            )
-        except Exception as e:
-            self.log.exception("Error connecting to modbus.")
-            raise e
-        self.log.debug("connected")
-        if self.telemetry_loop_task.result() is not None:
-            self.telemetry_loop_task.cancel()
-            self.log.debug("starting telemetry loop")
-        self.telemetry_loop_task = asyncio.create_task(self.telemetry_loop())
-        self.log.debug("end of begin_start")
-
-    async def end_standby(self, data):
-        """
-        When transitioning from disabled or fault state to standby,
-        cancels the telemetry loop task and disconnects from the ADAM
-        device.
-        """
-        if not self.telemetry_loop_task.done():
-            self.telemetry_loop_task.cancel()
-
-        try:
-            await self.telemetry_loop_task
-        except asyncio.CancelledError:
-            pass
-        except Exception:
-            self.log.exception(f"Exception in telemetry loop while in state {self.summary_state}")
-
-        try:
-            await self.adam.disconnect()
-        except Exception:
-            self.log.exception("Error disconnecting from controller.")
+    async def handle_summary_state(self):
+        if self.disabled_or_enabled:
+            if self.adam is None:
+                try:
+                    self.adam = AdamModel(
+                        self.config.adam_ip,
+                        self.config.adam_port,
+                        log=self.log,
+                        simulation_mode=self.simulation_mode,
+                    )
+                    self.log.debug("model created")
+                except ConnectionException:
+                    raise RuntimeError(
+                        "Unable to connect to modbus device at "
+                        f"{self.config.adam_ip}:{self.config.adam_port}."
+                    )
+                except Exception as e:
+                    self.log.exception("Error connecting to modbus.")
+                    raise e
+                self.log.debug(f"connected to modbus device at {self.config.adam_ip}")
+                if self.telemetry_loop_task.done():
+                    self.log.debug("starting telemetry loop")
+                    self.telemetry_loop_task = asyncio.create_task(self.telemetry_loop())
+            self.log.debug("done setting up CSC for disabled or enabled state")
+        else:
+            if not self.telemetry_loop_task.done():
+                self.telemetry_loop_task.cancel()
+            try:
+                await self.telemetry_loop_task
+            except asyncio.CancelledError:
+                pass
+            except Exception:
+                self.log.exception(f"Exception in telemetry loop while in state {self.summary_state}")
+            try:
+                await self.adam.disconnect()
+            except Exception:
+                self.log.exception("Error disconnecting from controller.")
 
     async def telemetry_loop(self):
         """
