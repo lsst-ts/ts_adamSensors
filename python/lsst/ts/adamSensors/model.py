@@ -25,21 +25,12 @@ class AdamModel:
     """
 
     def __init__(self, ip, port, log=None, simulation_mode=False):
-        def start_loop(loop):
-            """
-            Start Loop
-            :param loop:
-            :return:
-            """
-            asyncio.set_event_loop(loop)
-            loop.run_forever()
-
         self.loop = asyncio.new_event_loop()
         self.clientip = ip
         self.clientport = port
         self.client = None
 
-        self.t = Thread(target=start_loop, args=[self.loop])
+        self.t = Thread(target=self._start_loop, args=[self.loop])
         self.t.daemon = True
         # Start the loop
         self.t.start()
@@ -114,3 +105,12 @@ class AdamModel:
         """
         ctv = self.range_size / 65535
         return counts * ctv + self.range_start
+
+    def _start_loop(self, loop):
+            """
+            Start Loop
+            :param loop:
+            :return:
+            """
+            asyncio.set_event_loop(loop)
+            loop.run_forever()
