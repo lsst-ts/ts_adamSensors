@@ -85,9 +85,6 @@ class AdamModel:
             the voltages on the ADAM's input channels
         """
         try:
-            self.log.debug(dir(self.client))
-            self.log.debug(f"client connected={self.client.connected}")
-            self.log.debug(f"self.client.protocol={self.client.protocol}")
             readout = await self.client.protocol.read_input_registers(0, 8, unit=1)
             voltages = [self.counts_to_volts(r) for r in readout.registers]
             return voltages
