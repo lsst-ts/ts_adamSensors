@@ -5,7 +5,6 @@ from collections import namedtuple
 
 class MockModbusClient:
     def __init__(self, client, port):
-        pass
         self.host = client
         self.port = port
         self.protocol = self
@@ -33,6 +32,8 @@ class MockModbusClient:
         )
 
     def stop(self):
+        """The real client has a stop method that gets called when
+        we disconnect. This pretends to do that."""
         pass
 
     def _sin(self, period):

@@ -55,7 +55,7 @@ class AdamModel:
         self.range_start = -10  # zero point offset for the ADAM device
 
     async def disconnect(self):
-        self.client.stop()  # is this all that is needed to clean up after threads?
+        self.client.stop()
 
     async def read_voltage(self):
         """reads the voltage off of ADAM-6024's inputs for channels 0-5.
