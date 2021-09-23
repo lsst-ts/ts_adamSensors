@@ -55,11 +55,10 @@ class AdamCSC(salobj.ConfigurableCsc):
                         "Unable to connect to modbus device at "
                         f"{self.config.adam_ip}:{self.config.adam_port}."
                     )
-                except Exception as e:
+                except Exception:
                     self.log.exception("Error connecting to modbus.")
-                    raise e
-                self.log.debug(f"connected to modbus device at {self.adam.clientip}")
-                self.log.debug(f"connected to modbus device at {self.adam.client.host}")
+                    raise
+                self.log.debug(f"connected to modbus device at {self.adam.clientip}:{self.adam.clientport}")
                 if self.telemetry_loop_task.done():
                     self.log.debug("starting telemetry loop")
                     self.telemetry_loop_task = asyncio.create_task(
@@ -128,12 +127,8 @@ class AdamCSC(salobj.ConfigurableCsc):
 
         outputs = [0, 0, 0, 0, 0, 0]
         self.log.debug("about to start telemetry loop")
-        while True:
-            if self.adam is None:
-                break
-
+        while self.adam is not None:
             voltages = await self.adam.read_voltage()
-
             # convert the voltage into appropriate units, according to the
             # polynomial defined in configuration
             for i in range(6):
