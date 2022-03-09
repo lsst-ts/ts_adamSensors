@@ -6,13 +6,11 @@ from lsst.ts import adamSensors
 
 class ModelTestCase(unittest.IsolatedAsyncioTestCase):
     async def test_connect(self):
-        m = adamSensors.AdamModel(simulation_mode=True)
-        await m.connect("fakeIP", 502)
+        m = adamSensors.AdamModel("fakeIP", 502, simulation_mode=True)
         assert m is not None
 
     async def test_read_voltage(self):
-        m = adamSensors.AdamModel(simulation_mode=True)
-        await m.connect("fakeIP", 502)
+        m = adamSensors.AdamModel("fakeIP", 502, simulation_mode=True)
         v1 = await m.read_voltage()
 
         # check the min, max, and zero-ish values from simulator

@@ -5,7 +5,9 @@ from collections import namedtuple
 
 class MockModbusClient:
     def __init__(self, client, port):
-        pass
+        self.host = client
+        self.port = port
+        self.protocol = self
 
     async def read_input_registers(self, address, count=1, unit=1):
         """
@@ -29,7 +31,9 @@ class MockModbusClient:
             registers=[self._sin(7), 0, 65535, 32767, 32768, self._sin(11)]
         )
 
-    async def close(self):
+    def stop(self):
+        """The real client has a stop method that gets called when
+        we disconnect. This pretends to do that."""
         pass
 
     def _sin(self, period):

@@ -1,7 +1,10 @@
 from pymodbus.client.asynchronous.tcp import AsyncModbusTCPClient as ModbusClient
 from pymodbus.exceptions import ConnectionException
 from .mockModbus import MockModbusClient
+from pymodbus.client.asynchronous import schedulers
+from threading import Thread
 import logging
+import asyncio
 
 
 class AdamModel:
@@ -21,35 +24,38 @@ class AdamModel:
             the pymodbus object representing the ADAM 6024
     """
 
-    def __init__(self, log=None, simulation_mode=False):
+    def __init__(self, ip, port, log=None, simulation_mode=False):
+        self.loop = asyncio.new_event_loop()
+        self.clientip = ip
+        self.clientport = port
+        self.client = None
+
+        self.t = Thread(target=self._start_loop, args=[self.loop])
+        self.t.daemon = True
+        # Start the loop
+        self.t.start()
         if log is None:
             self.log = logging.getLogger(type(self).__name__)
         else:
             self.log = log.getChild(type(self).__name__)
-        self.client = None
-        self.clientip = None
-        self.clientport = None
-
-        self.range_size = 20
-        self.range_start = -10  # zero point offset for the ADAM device
-        self.simulation_mode = simulation_mode
-
-    async def connect(self, ip, port):
-        self.clientip = ip
-        self.clientport = port
-        if self.simulation_mode:
-            self.client = MockModbusClient(self.clientip, self.clientport)
+        if simulation_mode:
+            self.client = MockModbusClient(ip, port)
         else:
             try:
-                self.client = ModbusClient(self.clientip, self.clientport)
+                loop, self.client = ModbusClient(
+                    schedulers.ASYNC_IO, ip, port, loop=self.loop
+                )
             except AttributeError:
                 raise ConnectionException(
                     "Unable to connect to modbus device at "
                     f"{self.clientip}:{self.clientport}."
                 )
 
+        self.range_size = 20
+        self.range_start = -10  # zero point offset for the ADAM device
+
     async def disconnect(self):
-        await self.client.close()
+        self.client.stop()
 
     async def read_voltage(self):
         """reads the voltage off of ADAM-6024's inputs for channels 0-5.
@@ -64,10 +70,11 @@ class AdamModel:
             the voltages on the ADAM's input channels
         """
         try:
-            readout = await self.client.read_input_registers(0, 8, unit=1)
+            readout = await self.client.protocol.read_input_registers(0, 8, unit=1)
             voltages = [self.counts_to_volts(r) for r in readout.registers]
             return voltages
-        except AttributeError:
+        except AttributeError as e:
+            self.log.debug(e)
             # read_input_registers() *returns* (not raises) a
             # ModbusIOException in the event of loss of ADAM network
             # connectivity, which causes an AttributeError when we try
@@ -98,3 +105,12 @@ class AdamModel:
         """
         ctv = self.range_size / 65535
         return counts * ctv + self.range_start
+
+    def _start_loop(self, loop):
+        """
+        Start Loop
+        :param loop:
+        :return:
+        """
+        asyncio.set_event_loop(loop)
+        loop.run_forever()
